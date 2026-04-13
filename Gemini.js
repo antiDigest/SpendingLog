@@ -1,9 +1,8 @@
-// Gemini API key
-// AIzaSyAFw203JdgekxXCnK6wpDLypGLp_g_gX5c
+// Gemini API key required in config
 
 
 function sendPromptToGeminiAI_(q) {
-  const apiKey = 'AIzaSyAFw203JdgekxXCnK6wpDLypGLp_g_gX5c';  // Replace with your actual API key from Google Cloud
+  const apiKey = SECRETS_CONFIG['GEMINI_API_KEY'];  // Replace with your actual API key from Google Cloud
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   const payload = {

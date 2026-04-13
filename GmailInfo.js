@@ -1,6 +1,7 @@
 var columns = ["Year", "Month", "Day", "DayOfWeek", "DateTime", "Time", "Amount", "Merchant", "Category", "Timeline", "Card", "Last4", "From", "To"]
 
 function fillSpreadsheet() {
+  getMySecrets();
   getGmailData_(getGmails_("label:expenses"), getSpreadsheet_(), true, false);
 }
 
@@ -23,7 +24,7 @@ function cleanUpPastData() {
 }
 
 function getGmailData_(threads, sheet, deleteForever, reply) {
-  for(var t=threads.length-1; t>=0; t--) {
+  for (var t = threads.length - 1; t >= 0; t--) {
     var thread = threads[t];
     if (!thread.isUnread()) {
       continue;
@@ -51,97 +52,82 @@ function deleteForever_(thread) {
 
 function getGmails_(label) {
   var threads = GmailApp.search(label);
-  
-  var start = binarySearch_(threads, 0, threads.length-1);
-  if (start+5 < threads.length) {
-    start = start+5;
+
+  var start = binarySearch_(threads, 0, threads.length - 1);
+  if (start + 5 < threads.length) {
+    start = start + 5;
   }
 
-  return threads.slice(0, start+1);
+  return threads.slice(0, start + 1);
 }
 
 function extractMoreInfo_(sheet, thread, reply) {
   var messages = thread.getMessages();
+  Logger.log("DEBUG: Thread has " + messages.length + " messages.");
   var rows = [];
 
   var count = 0;
-  
-  for(var m=0; m<messages.length; m++) {
+
+  for (var m = 0; m < messages.length; m++) {
     var message = messages[m];
     var paymentMethod = defineSender_(message, reply);
+    Logger.log("DEBUG: Processing message " + m + " from " + paymentMethod);
+    Logger.log("DEBUG: Original sender header: " + message.getFrom());
+    Logger.log("DEBUG: Full email body start: " + message.getBody().substring(0, 1000));
 
     var row = {};
-    if (paymentMethod == "Discover") {
-      var sentences = askParserToParseBody_(message.getBody(), "1-800-DISCOVER", true);
-      row = processWhenAccountIsDiscover_(message, sentences, row);
-    } else if (paymentMethod == "Citi") {
-      var sentences = askParserToParseBody_(message.getBody(), "Your Citi Team", true);
-      row = processWhenAccountIsCiti_(message, sentences, row);
-    } else if (paymentMethod == "Chase") {
-      var sentences = askParserToParseBody_(message.getBody(), "Do not reply to this Alert.", false);
-      row = processWhenAccountIsChase_(message, sentences, row);
-    } else if (paymentMethod == "AmericanExpress") {
-      var amexMessageBody = message.getBody();
-      var sentences = askParserToParseBody_(amexMessageBody, "*The amount above may not", false);
-      row = processWhenAccountIsAmex_(message, sentences, row);
-    } else if (paymentMethod == "Venmo") {
-      var sentences = askParserToParseBody_(message.getBody(), "Like", false);
-      row = processWhenAccountIsVenmo_(message, sentences, row);
-    } else if (paymentMethod == "Bilt") {
-      var sentences = askParserToParseBody_(message.getBody(), "Don't Recognize This Transaction?", false);
-      row = processWhenAccountIsBilt_(message, sentences, row);
-    } else if (paymentMethod == "Zelle") {
-      var sentences = askParserToParseBody_(message.getBody(), "Wells Fargo Online Customer Service", false);
-      row = processWhenAccountIsZelle_(message, sentences, row);
+    var config = BANK_CONFIG[paymentMethod];
+    if (config) {
+      Logger.log("DEBUG: Parsing with config: " + JSON.stringify(config));
+      var sentences = askParserToParseBody_(message.getBody(), config.stoppingPhrase, config.tags);
+      Logger.log("DEBUG: Parser extracted " + sentences.length + " sentences.");
+      row = GenericParser.parse(paymentMethod, message, sentences, row);
     } else if (paymentMethod == "Reply") {
       var sentences = askParserToParseBody_(message.getBody(), "*****", true);
       row = processWhenAccountIsText_(sheet, message, sentences, row);
-    } else if (paymentMethod == "BankOfAmerica") {
-      var sentences = askParserToParseBody_(message.getBody(), "We'll never ask for your personal", true);
-      row = processWhenAccountIsBOA_(message, sentences, row);
+    } else {
+      Logger.log("DEBUG: No config found for: " + paymentMethod);
+      Logger.log("DEBUG: Full email body for debugging: " + message.getBody().substring(0, 500));
     }
 
-    row["category"] = categorize_(row["merchant"], row["dayOfWeek"], row["month"], row["year"], row["time"])
-    row["body"] = getExpandedCategory_(row["merchant"], row["dayOfWeek"], row["month"], row["year"], row["time"])
-    
+    // AI Categorization commented out for testing
+    // var aiData = getCategoryAndExpanded_(row["merchant"] || "Unknown", row["dayOfWeek"] || "N/A", row["month"] || "N/A", row["year"] || "N/A", row["time"] || "N/A");
+    row["category"] = "Uncategorized";
+    row["body"] = "AI call commented out";
+
+    var finalRow = [row["year"], row["month"], row["day"], row["dayOfWeek"], row["date"], row["time"], row["amount"], row["merchant"], row["category"], "", paymentMethod, row["last4"], row["From"], row["To"], row["body"]];
+    Logger.log("DEBUG: Final row for spreadsheet: " + JSON.stringify(finalRow));
+
     if (paymentMethod == "Reply") {
-      rows.push(row); 
+      rows.push(row);
     } else {
-      rows.push([row["year"], row["month"], row["day"], row["dayOfWeek"], row["date"], row["time"], row["amount"], row["merchant"], row["category"], "", paymentMethod, row["last4"], row["From"], row["To"], row["body"]]);
+      rows.push(finalRow);
     }
 
     if (count > 10) break;
-    Utilities.sleep(30000);
+    // Utilities.sleep(30000);
     count++;
   }
-  
+
   return rows;
 }
 
 function defineSender_(message, reply) {
   var mailFrom = message.getFrom();
-  if (reply || mailFrom.indexOf("4698793964") > -1) {
-    mailFrom = "Reply";
-  } else if (mailFrom.indexOf("discover") > -1) {
-    mailFrom = "Discover";
-  } else if (mailFrom.indexOf("citi") > -1) {
-    mailFrom = "Citi";
-  } else if (mailFrom.indexOf("chase") > -1) {
-    mailFrom = "Chase";
-  } else if (mailFrom.indexOf("AmericanExpress") > -1) {
-    mailFrom = "AmericanExpress";
-  } else if (mailFrom.indexOf("venmo") > -1) {
-    mailFrom = "Venmo";
-  } else if (mailFrom.indexOf("wellsfargo") > -1) {
-    if (message.getSubject().indexOf("Confirmation Code") > -1) {
-      mailFrom = "Zelle";
-    } else if (message.getSubject().indexOf("credit card purchase") > -1) {
-      mailFrom = "Bilt";
-    }
-  } else if (mailFrom.indexOf("bankofamerica") > -1) {
-    mailFrom = "BankOfAmerica";
-  }
-  return mailFrom;
+  var sender = "Unknown";
+  if (reply || mailFrom.indexOf("4698793964") > -1) sender = "Reply";
+  else if (mailFrom.indexOf("discover") > -1) sender = "Discover";
+  else if (mailFrom.indexOf("citi") > -1) sender = "Citi";
+  else if (mailFrom.indexOf("chase") > -1) sender = "Chase";
+  else if (mailFrom.indexOf("AmericanExpress") > -1) sender = "AmericanExpress";
+  else if (mailFrom.indexOf("venmo") > -1) sender = "Venmo";
+  else if (mailFrom.indexOf("wellsfargo") > -1) {
+    if (message.getSubject().indexOf("Confirmation Code") > -1) sender = "Zelle";
+    else if (message.getSubject().indexOf("credit card purchase") > -1) sender = "Bilt";
+  } else if (mailFrom.indexOf("bankofamerica") > -1) sender = "BankOfAmerica";
+
+  Logger.log("DEBUG: Sender identified as: " + sender);
+  return sender;
 }
 
 function askParserToParseBody_(body, stoppingPhrase, thisOneWillHaveTags) {
@@ -158,18 +144,18 @@ function askParserToParseBody_(body, stoppingPhrase, thisOneWillHaveTags) {
   return body;
 }
 
-function binarySearch_(threads, start, end){
+function binarySearch_(threads, start, end) {
   var veryEnd = end;
   var mid = 0;
   while (start <= end) {
-    mid = parseInt((start+end)/2);
+    mid = parseInt((start + end) / 2);
     if (mid == veryEnd) {
       return mid;
     }
-    if (threads[mid].isUnread() && !threads[mid+1].isUnread()) {
+    if (threads[mid].isUnread() && !threads[mid + 1].isUnread()) {
       return mid;
-    } else if (threads[mid].isUnread() && threads[mid+1].isUnread()) {
-      start = mid+1;
+    } else if (threads[mid].isUnread() && threads[mid + 1].isUnread()) {
+      start = mid + 1;
     } else {
       end = mid;
     }

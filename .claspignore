@@ -2,3 +2,4 @@
 !appsscript.json
 !*.js
 !*.html
+!parser/**/**.js

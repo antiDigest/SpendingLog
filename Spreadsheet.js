@@ -28,21 +28,21 @@ var MONTH_MAP = {
 
 
 function getSpreadsheet_() {
-    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = spreadsheet.getSheetByName("Spend Email Log");
-    return sheet;
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName("Spend Email Log");
+  return sheet;
 }
 
 function getOLDSpreadsheet_() {
-    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = spreadsheet.getSheetByName("OLD Spend Email Log");
-    return sheet;
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName("OLD Spend Email Log");
+  return sheet;
 }
 
 function getMonthSummarySpreadsheet_() {
-    var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-    var sheet = spreadsheet.getSheetByName("Monthly Spend Summaries");
-    return sheet;
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getSheetByName("Monthly Spend Summaries");
+  return sheet;
 }
 
 function fillSpreadsheet_(rows, sheet) {
@@ -51,9 +51,9 @@ function fillSpreadsheet_(rows, sheet) {
   }
 
   var filled = true;
-  for(var r=0; r<rows.length; r++) { 
+  for (var r = 0; r < rows.length; r++) {
     var row = rows[r];
-    if ((row[AMOUNTINDEX] == "" || row[AMOUNTINDEX] == null) || (row[DATEINDEX] == "" || row[DATEINDEX] == null) ) {
+    if ((row[AMOUNTINDEX] == "" || row[AMOUNTINDEX] == null) || (row[DATEINDEX] == "" || row[DATEINDEX] == null)) {
       return false;
     } else if (sheet.appendRow(row) == null) {
       filled = false;
@@ -64,18 +64,18 @@ function fillSpreadsheet_(rows, sheet) {
 }
 
 function highlightSpreadsheetRow_(sheet, row) {
-    if (row[3] == row[row.length-1]) {
-        highlightSpreadsheetRow_(sheet, row, "fc6e4e");
-    } else if (row[4].indexOf("notification") > -1) {
-        highlightSpreadsheetRow_(sheet, row, "fcc900");
-    }
+  if (row[3] == row[row.length - 1]) {
+    highlightSpreadsheetRow_(sheet, row, "fc6e4e");
+  } else if (row[4].indexOf("notification") > -1) {
+    highlightSpreadsheetRow_(sheet, row, "fcc900");
+  }
 }
 
 function highlightSpreadsheetRow_(sheet, row, color) {
-    var sheetRow = sheet.getLastRow();
-    var sheetCol = sheet.getLastColumn();
-    var rowRange = sheet.getRange(sheetRow, 1, 1, row.length);
-    rowRange.setBackground(color);
+  var sheetRow = sheet.getLastRow();
+  var sheetCol = sheet.getLastColumn();
+  var rowRange = sheet.getRange(sheetRow, 1, 1, row.length);
+  rowRange.setBackground(color);
 }
 
 function getIndexedRowValues_(sheet, indexFromBottom) {
@@ -86,7 +86,7 @@ function getIndexedRowValues_(sheet, indexFromBottom) {
 function updateIndexedRowWithValueAtIndex_(sheet, index, value, indexFromBottom) {
   // Logger.log(value);
   var indexedRow = sheet.getLastRow() - indexFromBottom;
-  var cell = sheet.getRange(indexedRow, index+1, 1, 1);
+  var cell = sheet.getRange(indexedRow, index + 1, 1, 1);
   if (index == AMOUNTINDEX) {
     cell.setNumberFormat("$ 0.00");
     cell.setValue(value);
@@ -99,9 +99,9 @@ function getCurrentMonthRowValues_(sheet) {
   date = new Date(date.getTime());
 
   var filteredData = [];
-  for (var i=0; i<data.length; i++) {
-    if (data[i][DATEYEARINDEX] == date.getFullYear() && 
-          MONTH_MAP[data[i][DATEMONTHINDEX]] == date.getMonth()) {
+  for (var i = 0; i < data.length; i++) {
+    if (data[i][DATEYEARINDEX] == date.getFullYear() &&
+      MONTH_MAP[data[i][DATEMONTHINDEX]] == date.getMonth()) {
       filteredData.push(data[i]);
     }
   }
@@ -120,9 +120,9 @@ function getPreviousMonthRowValues_(sheet) {
   }
 
   var filteredData = [];
-  for (var i=0; i<data.length; i++) {
-    if (data[i][DATEYEARINDEX] == date.getFullYear() && 
-          MONTH_MAP[data[i][DATEMONTHINDEX]] == previousMonth) {
+  for (var i = 0; i < data.length; i++) {
+    if (data[i][DATEYEARINDEX] == date.getFullYear() &&
+      MONTH_MAP[data[i][DATEMONTHINDEX]] == previousMonth) {
       filteredData.push(data[i]);
     }
   }
@@ -133,7 +133,7 @@ function getPreviousMonthRowValues_(sheet) {
 function getSpreadsheetData_(sheet) {
   var lastRow = sheet.getLastRow();
   try {
-    var range = sheet.getRange(2, 1, lastRow-2, sheet.getLastColumn())
+    var range = sheet.getRange(2, 1, lastRow - 2, sheet.getLastColumn())
   } catch {
     return []
   }
@@ -148,7 +148,7 @@ function fillMonthlySummarySpreadsheet_(rows, sheet) {
   }
 
   var filled = true;
-  for(var r=0; r<rows.length; r++) { 
+  for (var r = 0; r < rows.length; r++) {
     var row = rows[r];
     if (sheet.appendRow(row) == null) {
       filled = false;
@@ -167,7 +167,7 @@ function appendRows_(rows, sheet) {
     sheet.getLastRow() + 1,
     1,
     rows.length,
-    rows[0].length         
+    rows[0].length
   ).setValues(rows)
   return filled;
 }

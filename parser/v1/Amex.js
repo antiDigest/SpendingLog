@@ -1,3 +1,5 @@
+// AMEX
+
 function processWhenAccountIsAmex_(message, sentences, row) {
   row["merchant"] = ""
   for (var i=0; i<sentences.length; i++) {
