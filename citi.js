@@ -13,7 +13,7 @@ function processWhenAccountIsCiti_(message, sentences, row) {
   }
   row = transactionDateFromEmailMessage_(message.getDate(), row);
 
-  row["body"] = sentences.join(" :: ");
+  // row["body"] = sentences.join(" :: ");
 
   return row;
 }

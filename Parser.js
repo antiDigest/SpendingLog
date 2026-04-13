@@ -35,7 +35,6 @@ function replaceUselessTags_(body, thisOneWillHaveTags) {
   }
 
   bodyHtml = bodyHtml.replace(/&/g, "&amp;");
-  // Logger.log(bodyHtml);
 
   return bodyHtml;
 }
@@ -45,14 +44,12 @@ function getTextList_(element, stoppingPhrase) {
   var descendants = element.getDescendants();
   descendants.push(element);  
   for(i in descendants) {
-    // Logger.log(descendants);
     try {
       var elt = descendants[i].asElement();
       var elementText = elt.getText();
       if (elementText != null && elementText != "") {
         elementText = elementText.trim();
         if (elementText != "") {
-          // Logger.log(elementText);
           data.push(elementText);
         }
         if (elementText.indexOf(stoppingPhrase) > -1) {

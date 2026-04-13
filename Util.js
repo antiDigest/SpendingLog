@@ -25,3 +25,16 @@ function getAmountFromBody_(body) {
   var amountRegex = new RegExp(/(?:[\£\$\€]{1}[,\d]+.?\d*)/);
   return body.match(amountRegex)[0];
 }
+
+/**
+ * Retruns date object
+ * 
+ * @param {date|string} date Date where you subtract days from.
+ * @param {number} days Amount of days to subtract.
+ * @returns {date} Date object.
+ */
+function subtractDays_(date, days){
+  const unix = new Date(date).getTime()
+  const minusUnix = unix - (1000 * 60 * 60 * 24 * days)
+  return new Date(minusUnix)
+}

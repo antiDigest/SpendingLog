@@ -5,12 +5,12 @@ function sendText(rows, columns) {
     var row = rows[r];
     var body = generateBody_(row, columns);
     var subject = generateSubject_(row, columns);
-    GmailApp.sendEmail(myPhone, subject, body);
+    sendTextDirect(subject, body);
   }
 }
 
-function sendText(subject, body) {
-  GmailApp.sendEmail(myPhone, subject, body);
+function sendTextDirect(subject, body) {
+  //GmailApp.sendEmail(myPhone, subject, body);
 }
 
 function generateBody_(row, columns) {
