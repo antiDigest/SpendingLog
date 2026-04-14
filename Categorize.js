@@ -19,7 +19,8 @@ function categorizeBatch_(merchants) {
       12. Medical/Pharmacy
       13. Donations/Charities
       14. Sports/Recreation
-      15. Other
+      15. Career/Growth
+      16. Other
 
       Merchants:
       ${JSON.stringify(merchants, null, 2)}
@@ -33,6 +34,10 @@ function categorizeBatch_(merchants) {
         "Amazon": {
           "Category": "Online Retails/Marketplace",
           "ExpandedCategory": "amazon online marketplace"
+        },
+        "INTERVIEWDB": {
+          "Category": "Career/Growth",
+          "ExpandedCategory": "interview prep"
         },
       }`;
 
