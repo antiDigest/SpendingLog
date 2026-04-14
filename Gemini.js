@@ -2,11 +2,14 @@
 
 
 function sendPromptToGeminiAI_(q) {
-  const apiKey = SECRETS_CONFIG['GEMINI_API_KEY'];  // Replace with your actual API key from Google Cloud
+  const apiKey = SECRETS_CONFIG['GEMINI_API_KEY'];
   const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
   const payload = {
-    contents: [{ parts: [{ text: q }] }]
+    contents: [{ parts: [{ text: q }] }],
+    generationConfig: {
+      responseMimeType: "application/json"
+    }
   };
 
   const options = {
@@ -15,11 +18,16 @@ function sendPromptToGeminiAI_(q) {
     payload: JSON.stringify(payload)
   };
 
-  const response = UrlFetchApp.fetch(url, options);
-  const jsonResponse = JSON.parse(response.getContentText());
+  try {
+    const response = UrlFetchApp.fetch(url, options);
+    const jsonResponse = JSON.parse(response.getContentText());
+  } catch (e) {
+    Logger.log("Error returned from Gemini: " + e);
+    return "{}";
+  }
 
   if (jsonResponse.candidates && jsonResponse.candidates.length > 0) {
     return jsonResponse.candidates[0].content.parts.map(part => part.text).join('').trim();
   }
-  return "No response received.";
+  return "{}";
 }

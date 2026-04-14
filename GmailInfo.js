@@ -24,25 +24,215 @@ function cleanUpPastData() {
 }
 
 function getGmailData_(threads, sheet, deleteForever, reply) {
+  var allMessages = [];
+  var threadStatusMap = {};
+
+  // Collect all unread messages + initialize tracking per thread
   for (var t = threads.length - 1; t >= 0; t--) {
     var thread = threads[t];
+
     if (!thread.isUnread()) {
       continue;
     }
-    var rows = extractMoreInfo_(sheet, thread, reply);
-    var filled = false;
-    if (reply) {
-      filled = true;
-    } else {
-      filled = fillSpreadsheet_(rows, sheet);
-    }
-    sendText(rows, columns);
-    // thread.markRead();
-    if (deleteForever && filled) {
-      deleteForever_(thread);
-    }
-    // break;
+
+    var threadId = thread.getId();
+    var messages = thread.getMessages();
+
+    allMessages = allMessages.concat(messages);
+
+    threadStatusMap[threadId] = {
+      status: "OK",
+      reasons: [],
+      rowCount: 0
+    };
   }
+
+  // Process everything
+  var result = processAllMessages_(allMessages, sheet, reply, threadStatusMap);
+
+  var finalProcessedRows = result.rows;
+
+  // Write + send
+  fillSpreadsheet_(finalProcessedRows, sheet);
+  sendText(finalProcessedRows, columns);
+
+  // SAFE DELETE LOGIC
+  if (deleteForever) {
+    for (var i = 0; i < threads.length; i++) {
+      var thread = threads[i];
+      var threadId = thread.getId();
+      var status = threadStatusMap[threadId];
+
+      if (status && status.status === "OK") {
+        Logger.log("DELETING THREAD: " + threadId);
+        // thread.moveToTrash(); // safer than permanent delete
+        deleteForever_(thread);
+      } else {
+        Logger.log(
+          "SKIPPING DELETE THREAD: " +
+          threadId +
+          " | status: " +
+          (status ? status.status : "UNKNOWN") +
+          " | reasons: " +
+          JSON.stringify(status ? status.reasons : [])
+        );
+      }
+    }
+  }
+
+  return result;
+}
+// New function to process all messages in batch
+function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
+  var allRowData = [];
+  var allMerchantsToCategorize = [];
+  var merchantRowMapping = {};
+
+  for (var i = 0; i < allMessages.length; i++) {
+    var message = allMessages[i];
+
+    var threadId = message.getThread().getId();
+    var threadStatus = threadStatusMap[threadId];
+
+    var paymentMethod = defineSender_(message, reply);
+
+    Logger.log("DEBUG: Processing message " + i + " from " + paymentMethod);
+
+    var row = {};
+    var config = BANK_CONFIG[paymentMethod];
+
+    // ---------------------------
+    // PARSING
+    // ---------------------------
+    if (config) {
+      var sentences = askParserToParseBody_(
+        message.getBody(),
+        config.stoppingPhrase,
+        config.tags
+      );
+
+      row = GenericParser.parse(paymentMethod, message, sentences, row);
+    }
+    else if (paymentMethod == "Reply") {
+      var sentences = askParserToParseBody_(message.getBody(), "*****", true);
+      row = processWhenAccountIsText_(sheet, message, sentences, row);
+    }
+    else {
+      Logger.log("DEBUG: No config found for: " + paymentMethod);
+
+      if (threadStatus) {
+        threadStatus.status = "NEEDS_ATTENTION";
+        threadStatus.reasons.push("No config for paymentMethod: " + paymentMethod);
+      }
+    }
+
+    // ---------------------------
+    // VALIDATION FLAGS
+    // ---------------------------
+    var isValid = true;
+
+    if (!row["amount"]) {
+      isValid = false;
+      if (threadStatus) threadStatus.reasons.push("Missing amount");
+    }
+
+    var merchant = row["merchant"] || "Unknown";
+    if (!merchant || merchant === "Unknown") {
+      isValid = false;
+      if (threadStatus) threadStatus.reasons.push("Missing merchant");
+    }
+
+    // ---------------------------
+    // MERCHANT COLLECTION (only if valid-ish)
+    // ---------------------------
+    if (merchant && merchant !== "Unknown" && merchant !== "AI call pending" && merchant !== "Other") {
+      allMerchantsToCategorize.push(merchant);
+
+      if (!merchantRowMapping[merchant]) {
+        merchantRowMapping[merchant] = [];
+      }
+      merchantRowMapping[merchant].push(allRowData.length);
+    }
+
+    // ---------------------------
+    // TEMP PLACEHOLDERS
+    // ---------------------------
+    row["category"] = "Uncategorized";
+    row["body"] = "AI call pending";
+
+    var finalRow = [
+      row["year"],
+      row["month"],
+      row["day"],
+      row["dayOfWeek"],
+      row["date"],
+      row["time"],
+      row["amount"],
+      merchant,
+      row["category"],
+      "",
+      paymentMethod,
+      row["last4"],
+      row["From"],
+      row["To"],
+      row["body"]
+    ];
+
+    allRowData.push(finalRow);
+
+    // ---------------------------
+    // THREAD STATUS UPDATE
+    // ---------------------------
+    if (threadStatus && isValid) {
+      threadStatus.rowCount++;
+    }
+
+    if (threadStatus && !isValid) {
+      threadStatus.status = "NEEDS_ATTENTION";
+    }
+
+    Logger.log("DEBUG: Final row: " + JSON.stringify(finalRow));
+  }
+
+  // ---------------------------
+  // BATCH CATEGORIZATION
+  // ---------------------------
+  if (allMerchantsToCategorize.length > 0) {
+    var uniqueMerchants = [...new Set(allMerchantsToCategorize)];
+    var categorizedResults = categorizeBatch_(uniqueMerchants);
+
+    for (var merchant in categorizedResults) {
+      if (categorizedResults.hasOwnProperty(merchant)) {
+        var categoryData = categorizedResults[merchant];
+
+        var category = categoryData.Category || "Other";
+        var expandedCategory =
+          categoryData.ExpandedCategory ||
+          "Categorized by Gemini AI (Batch).";
+
+        var rowIndices = merchantRowMapping[merchant];
+
+        if (rowIndices) {
+          for (var j = 0; j < rowIndices.length; j++) {
+            var rowIndex = rowIndices[j];
+
+            if (allRowData[rowIndex]) {
+              allRowData[rowIndex][CATEGORYINDEX] = category;
+              allRowData[rowIndex][allRowData[rowIndex].length - 1] =
+                expandedCategory;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  Logger.log("DEBUG: All row data: " + JSON.stringify(allRowData));
+
+  return {
+    rows: allRowData,
+    threadStatusMap: threadStatusMap
+  };
 }
 
 function deleteForever_(thread) {
@@ -61,57 +251,6 @@ function getGmails_(label) {
   return threads.slice(0, start + 1);
 }
 
-function extractMoreInfo_(sheet, thread, reply) {
-  var messages = thread.getMessages();
-  Logger.log("DEBUG: Thread has " + messages.length + " messages.");
-  var rows = [];
-
-  var count = 0;
-
-  for (var m = 0; m < messages.length; m++) {
-    var message = messages[m];
-    var paymentMethod = defineSender_(message, reply);
-    Logger.log("DEBUG: Processing message " + m + " from " + paymentMethod);
-    Logger.log("DEBUG: Original sender header: " + message.getFrom());
-    Logger.log("DEBUG: Full email body start: " + message.getBody().substring(0, 1000));
-
-    var row = {};
-    var config = BANK_CONFIG[paymentMethod];
-    if (config) {
-      Logger.log("DEBUG: Parsing with config: " + JSON.stringify(config));
-      var sentences = askParserToParseBody_(message.getBody(), config.stoppingPhrase, config.tags);
-      Logger.log("DEBUG: Parser extracted " + sentences.length + " sentences.");
-      row = GenericParser.parse(paymentMethod, message, sentences, row);
-    } else if (paymentMethod == "Reply") {
-      var sentences = askParserToParseBody_(message.getBody(), "*****", true);
-      row = processWhenAccountIsText_(sheet, message, sentences, row);
-    } else {
-      Logger.log("DEBUG: No config found for: " + paymentMethod);
-      Logger.log("DEBUG: Full email body for debugging: " + message.getBody().substring(0, 500));
-    }
-
-    // AI Categorization commented out for testing
-    // var aiData = getCategoryAndExpanded_(row["merchant"] || "Unknown", row["dayOfWeek"] || "N/A", row["month"] || "N/A", row["year"] || "N/A", row["time"] || "N/A");
-    row["category"] = "Uncategorized";
-    row["body"] = "AI call commented out";
-
-    var finalRow = [row["year"], row["month"], row["day"], row["dayOfWeek"], row["date"], row["time"], row["amount"], row["merchant"], row["category"], "", paymentMethod, row["last4"], row["From"], row["To"], row["body"]];
-    Logger.log("DEBUG: Final row for spreadsheet: " + JSON.stringify(finalRow));
-
-    if (paymentMethod == "Reply") {
-      rows.push(row);
-    } else {
-      rows.push(finalRow);
-    }
-
-    if (count > 10) break;
-    // Utilities.sleep(30000);
-    count++;
-  }
-
-  return rows;
-}
-
 function defineSender_(message, reply) {
   var mailFrom = message.getFrom();
   var sender = "Unknown";
@@ -125,6 +264,7 @@ function defineSender_(message, reply) {
     if (message.getSubject().indexOf("Confirmation Code") > -1) sender = "Zelle";
     else if (message.getSubject().indexOf("credit card purchase") > -1) sender = "Bilt";
   } else if (mailFrom.indexOf("bankofamerica") > -1) sender = "BankOfAmerica";
+  else if (mailFrom.indexOf("Antriksh") > -1 || mailFrom.indexOf("antriksh") > -1) sender = "BankOfAmerica";
 
   Logger.log("DEBUG: Sender identified as: " + sender);
   return sender;

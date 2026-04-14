@@ -58,22 +58,17 @@ function fillSpreadsheet_(rows, sheet) {
     } else if (sheet.appendRow(row) == null) {
       filled = false;
     }
-    // highlightSpreadsheetRow_(sheet, row, "fc6e4e");
+    highlightSpreadsheetRow_(sheet, row);
   }
   return filled;
 }
 
 function highlightSpreadsheetRow_(sheet, row) {
-  if (row[3] == row[row.length - 1]) {
-    highlightSpreadsheetRow_(sheet, row, "fc6e4e");
-  } else if (row[4].indexOf("notification") > -1) {
-    highlightSpreadsheetRow_(sheet, row, "fcc900");
-  }
+  highlightSpreadsheetRowAtIndex_(sheet, row, sheet.getLastRow());
 }
 
-function highlightSpreadsheetRow_(sheet, row, color) {
+function setBackgroundForRow_(sheet, row, color) {
   var sheetRow = sheet.getLastRow();
-  var sheetCol = sheet.getLastColumn();
   var rowRange = sheet.getRange(sheetRow, 1, 1, row.length);
   rowRange.setBackground(color);
 }
@@ -163,13 +158,45 @@ function appendRows_(rows, sheet) {
   }
 
   var filled = true;
+  var lastRow = sheet.getLastRow();
   sheet.getRange(
-    sheet.getLastRow() + 1,
+    lastRow + 1,
     1,
     rows.length,
     rows[0].length
-  ).setValues(rows)
+  ).setValues(rows);
+
+  for (var i = 0; i < rows.length; i++) {
+    highlightSpreadsheetRowAtIndex_(sheet, rows[i], lastRow + 1 + i);
+  }
+
   return filled;
+}
+
+function highlightSpreadsheetRowAtIndex_(sheet, row, rowIndex) {
+  var amountStr = row[AMOUNTINDEX];
+  if (typeof amountStr === "string") {
+    amountStr = amountStr.replace(/[$,]/g, "");
+  }
+  var amount = parseFloat(amountStr);
+  var color = null;
+  if (amount > 1000) {
+    color = "#FF6F61"; // Dull-Red-ish
+  } else if (amount > 500) {
+    color = "#FFB74D"; // Red-ish
+  } else if (amount > 200) {
+    color = "#FFD54F"; // Fire Orange
+  } else if (amount > 100) {
+    color = "#FFF176"; // Orange
+  } else if (amount > 50) {
+    color = "#FFF9C4"; // Warm yellow
+  } else if (amount > 25) {
+    color = "#FFFDE7"; // light yellow
+  }
+
+  if (color) {
+    sheet.getRange(rowIndex, 1, 1, row.length).setBackground(color);
+  }
 }
 
 

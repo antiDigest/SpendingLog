@@ -1,5 +1,5 @@
 var GenericParser = {
-  parse: function(paymentMethod, message, sentences, row) {
+  parse: function (paymentMethod, message, sentences, row) {
     row["merchant"] = "";
     row["amount"] = 0.00;
     row["last4"] = "";
@@ -18,8 +18,8 @@ var GenericParser = {
     return transactionDateFromEmailMessage_(message.getDate(), row);
   },
 
-  Discover: function(sentences, row) {
-    for (var i=0; i<sentences.length; i++) {
+  Discover: function (sentences, row) {
+    for (var i = 0; i < sentences.length; i++) {
       if (sentences[i].indexOf("Merchant") > -1) {
         row["merchant"] = sentences[i].split("Merchant: ")[1] || "";
       } else if (sentences[i].indexOf("Last 4 #:") > -1) {
@@ -29,24 +29,24 @@ var GenericParser = {
     row["amount"] = this.extractAmount(sentences.join(" :: "));
   },
 
-  Chase: function(sentences, row) {
-    for (var i=0; i<sentences.length; i++) {
-      if (sentences[i].indexOf("Merchant") > -1) row["merchant"] = sentences[i+1];
-      else if (sentences[i].indexOf("Amount") > -1) row["amount"] = parseFloat(sentences[i+1].split("$")[1]);
-      else if (sentences[i].indexOf("Account") > -1) row["last4"] = sentences[i+1].split("...")[1].split(")")[0];
+  Chase: function (sentences, row) {
+    for (var i = 0; i < sentences.length; i++) {
+      if (sentences[i].indexOf("Merchant") > -1) row["merchant"] = sentences[i + 1];
+      else if (sentences[i].indexOf("Amount") > -1) row["amount"] = parseFloat(sentences[i + 1].split("$")[1]);
+      else if (sentences[i].indexOf("Account") > -1) row["last4"] = sentences[i + 1].split("...")[1].split(")")[0];
     }
   },
 
-  Citi: function(sentences, row) {
-    for (var i=0; i<sentences.length; i++) {
+  Citi: function (sentences, row) {
+    for (var i = 0; i < sentences.length; i++) {
       if (sentences[i].indexOf("Amount") > -1) row["amount"] = this.extractAmount(sentences[i]);
-      else if (sentences[i].indexOf("Merchant") > -1) row["merchant"] = sentences[i+1].trim();
-      else if (sentences[i].indexOf("Card Ending") > -1) row["last4"] = sentences[i+1];
+      else if (sentences[i].indexOf("Merchant") > -1) row["merchant"] = sentences[i + 1].trim();
+      else if (sentences[i].indexOf("Card Ending") > -1) row["last4"] = sentences[i + 1];
     }
   },
 
-  AmericanExpress: function(sentences, row) {
-    for (var i=0; i<sentences.length; i++) {
+  AmericanExpress: function (sentences, row) {
+    for (var i = 0; i < sentences.length; i++) {
       if (sentences[i].indexOf("large purchase notifications online.") > -1) {
         var idx = i + 1;
         while (idx < sentences.length && (sentences[idx] == "" || sentences[idx] == "&Acirc;")) idx++;
@@ -60,9 +60,9 @@ var GenericParser = {
     }
   },
 
-  Venmo: function(sentences, row) {
+  Venmo: function (sentences, row) {
     var amountComplete = false;
-    for (var i=0; i<sentences.length; i++) {
+    for (var i = 0; i < sentences.length; i++) {
       if (sentences[i].indexOf("$") > -1 && !amountComplete) {
         var amt = sentences[i].split("$")[1].split("*")[0];
         row["amount"] = (sentences[i].indexOf("+") > -1 || row["To"] == "You") ? -1 * amt : amt;
@@ -75,21 +75,32 @@ var GenericParser = {
     }
   },
 
-  BankOfAmerica: function(sentences, row) {
-    for (var i=0; i<sentences.length; i++) {
-      if (sentences[i].indexOf("Where:") > -1) row["merchant"] = sentences[i+1];
-      else if (sentences[i].indexOf("Amount") > -1) row["amount"] = parseFloat(sentences[i+1].split("$")[1]);
-      else if (sentences[i].indexOf("ending in ") > -1) row["last4"] = sentences[i].split("ending in ")[1];
+  BankOfAmerica: function (sentences, row) {
+    for (var i = 0; i < sentences.length; i++) {
+      if (sentences[i].indexOf("Where:") > -1) row["merchant"] = sentences[i + 1];
+      else if (sentences[i].indexOf("Amount") > -1) {
+        Logger.log("DEBUG: parsing amount to: " + extractDollarAmount(sentences[i + 1]));
+        row["amount"] = extractDollarAmount(sentences[i + 1]);
+      } else if (sentences[i].indexOf("ending in ") > -1) row["last4"] = sentences[i].split("ending in ")[1];
     }
   },
 
-  extractAmount: function(body) {
+  extractAmount: function (body) {
     var match = body.match(/(?:[\£\$\€]{1}[,\d]+.?\d*)/);
     return match ? parseFloat(match[0].replace(/[$,]/g, '')) : 0.00;
   },
 
-  extractLast4: function(body) {
+  extractLast4: function (body) {
     var match = body.match(/(?:ending in |last 4 #:|Card Ending)\s*[:.]?\s*(\d+)/i);
     return match ? match[1] : null;
   }
 };
+
+function extractDollarAmount(text) {
+  const match = text.match(/\$\s?[\d,]+(?:\.\d{2})?/);
+  if (!match) return null;
+
+  // remove $ and commas, then convert to number
+  const cleaned = match[0].replace(/[$,]/g, '');
+  return parseFloat(cleaned);
+}
