@@ -264,7 +264,7 @@ function defineSender_(message, reply) {
     if (message.getSubject().indexOf("Confirmation Code") > -1) sender = "Zelle";
     else if (message.getSubject().indexOf("credit card purchase") > -1) sender = "Bilt";
   } else if (mailFrom.indexOf("bankofamerica") > -1) sender = "BankOfAmerica";
-  else if (mailFrom.indexOf("Antriksh") > -1 || mailFrom.indexOf("antriksh") > -1) sender = "BankOfAmerica";
+  else if (mailFrom.indexOf("Antriksh") > -1 || mailFrom.indexOf("antriksh") > -1) sender = "Citi";
 
   Logger.log("DEBUG: Sender identified as: " + sender);
   return sender;

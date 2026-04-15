@@ -3,7 +3,7 @@
 
 function sendPromptToGeminiAI_(q) {
   const apiKey = SECRETS_CONFIG['GEMINI_API_KEY'];
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash:generateContent?key=${apiKey}`;
 
   const payload = {
     contents: [{ parts: [{ text: q }] }],
@@ -18,9 +18,10 @@ function sendPromptToGeminiAI_(q) {
     payload: JSON.stringify(payload)
   };
 
+  let jsonResponse = {};
   try {
     const response = UrlFetchApp.fetch(url, options);
-    const jsonResponse = JSON.parse(response.getContentText());
+    jsonResponse = JSON.parse(response.getContentText());
   } catch (e) {
     Logger.log("Error returned from Gemini: " + e);
     return "{}";
