@@ -41,7 +41,7 @@ function addMonthlyCarPayment() {
   var data = sheet.getDataRange().getValues();
   for (var i = 1; i < data.length; i++) {
     var rowDate = new Date(data[i][DATEINDEX]);
-    if (rowDate.getMonth() === month && rowDate.getFullYear() === year && data[i][MERCHANTINDEX] === "Car Payment") {
+    if (rowDate.getMonth() === month && rowDate.getFullYear() === year && data[i][MERCHANTINDEX] === "Honda Financial") {
       return; // Already added
     }
   }
@@ -59,7 +59,7 @@ function addMonthlyCarPayment() {
     today, // Date
     time, // Time
     1117.00,
-    "Car Payment",
+    "Honda Financial",
     "Insurance/Financial",
     "",
     "WellsFargo",
