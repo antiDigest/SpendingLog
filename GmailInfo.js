@@ -66,7 +66,7 @@ function getGmailData_(threads, sheet, deleteForever, reply) {
       if (status && status.status === "OK") {
         Logger.log("DELETING THREAD: " + threadId);
         // thread.moveToTrash(); // safer than permanent delete
-        // deleteForever_(thread);
+        deleteForever_(thread);
       } else {
         Logger.log(
           "SKIPPING DELETE THREAD: " +
