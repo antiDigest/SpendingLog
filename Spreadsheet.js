@@ -46,14 +46,16 @@ function addMonthlyCarPayment() {
     }
   }
 
+  var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var monthText = months[month];
   var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   var dayOfWeek = days[today.getDay()];
-  var time = today.getHours() + ":" + today.getMinutes();
+  var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 
   // Add the row
   var row = [
     year,
-    month + 1, // Use 1-indexed month for consistency if needed, adjust if your system expects 0-indexed
+    monthText, // Use 1-indexed month for consistency if needed, adjust if your system expects 0-indexed
     today.getDate(),
     dayOfWeek,
     today, // Date
@@ -68,7 +70,7 @@ function addMonthlyCarPayment() {
     "",
     "Scheduled Honda-CRV payment"
   ];
-  sheet.appendRow(row);
+  appendRows([row], sheet);
 }
 
 function getSpreadsheet_() {
