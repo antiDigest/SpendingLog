@@ -27,6 +27,50 @@ var MONTH_MAP = {
 }
 
 
+function addMonthlyCarPayment() {
+  var sheet = getSpreadsheet_();
+  var today = new Date();
+
+  // Only proceed if today is the 20th
+  if (today.getDate() !== 20) return;
+
+  var month = today.getMonth();
+  var year = today.getFullYear();
+
+  // Check if payment already exists for this month/year
+  var data = sheet.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    var rowDate = new Date(data[i][DATEINDEX]);
+    if (rowDate.getMonth() === month && rowDate.getFullYear() === year && data[i][MERCHANTINDEX] === "Car Payment") {
+      return; // Already added
+    }
+  }
+
+  var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  var dayOfWeek = days[today.getDay()];
+  var time = today.getHours() + ":" + today.getMinutes();
+
+  // Add the row
+  var row = [
+    year,
+    month + 1, // Use 1-indexed month for consistency if needed, adjust if your system expects 0-indexed
+    today.getDate(),
+    dayOfWeek,
+    today, // Date
+    time, // Time
+    1117.00,
+    "Car Payment",
+    "Insurance/Financial",
+    "",
+    "WellsFargo",
+    "2263",
+    "",
+    "",
+    "Scheduled Honda-CRV payment"
+  ];
+  sheet.appendRow(row);
+}
+
 function getSpreadsheet_() {
   var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
   var sheet = spreadsheet.getSheetByName("Spend Email Log");

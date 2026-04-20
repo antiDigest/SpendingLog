@@ -4,7 +4,7 @@ var BANK_CONFIG = {
   "Chase": { "stoppingPhrase": "Do not reply to this Alert.", "tags": false },
   "AmericanExpress": { "stoppingPhrase": "*The amount above may not", "tags": false },
   "Venmo": { "stoppingPhrase": "Like", "tags": false },
-  "Bilt": { "stoppingPhrase": "Don't Recognize This Transaction?", "tags": false },
+  "Bilt": { "stoppingPhrase": "Ways you're getting rewarded on rent", "tags": false },
   "Zelle": { "stoppingPhrase": "Wells Fargo Online Customer Service", "tags": false },
   "BankOfAmerica": { "stoppingPhrase": "We'll never ask for your personal", "tags": true },
   "CATEGORIES": [

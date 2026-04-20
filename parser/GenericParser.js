@@ -60,6 +60,20 @@ var GenericParser = {
     }
   },
 
+  Bilt: function (sentences, row) {
+    for (var i = 0; i < sentences.length; i++) {
+      var s = sentences[i].toLowerCase();
+      if (s.indexOf("payment amount") > -1 && sentences[i+1] && sentences[i+1].indexOf("$") > -1) {
+        row["amount"] = this.extractAmount(sentences[i + 1]);
+      } else if (s.indexOf("payment to") > -1) {
+        row["merchant"] = sentences[i + 1].trim();
+      } else if (s.indexOf("bank account last four") > -1) {
+        row["last4"] = sentences[i + 1].trim();
+      }
+    }
+    row["category"] = "Rent/Utilities/Phone/Internet";
+  },
+
   Venmo: function (sentences, row) {
     var amountComplete = false;
     for (var i = 0; i < sentences.length; i++) {

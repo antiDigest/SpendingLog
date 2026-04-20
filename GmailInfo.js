@@ -66,7 +66,7 @@ function getGmailData_(threads, sheet, deleteForever, reply) {
       if (status && status.status === "OK") {
         Logger.log("DELETING THREAD: " + threadId);
         // thread.moveToTrash(); // safer than permanent delete
-        deleteForever_(thread);
+        // deleteForever_(thread);
       } else {
         Logger.log(
           "SKIPPING DELETE THREAD: " +
@@ -157,8 +157,8 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
     // ---------------------------
     // TEMP PLACEHOLDERS
     // ---------------------------
-    row["category"] = "Uncategorized";
-    row["body"] = "AI call pending";
+    row["category"] = row["category"] || "Uncategorized";
+    row["body"] = row["body"] || "AI call pending";
 
     var finalRow = [
       row["year"],
@@ -216,7 +216,7 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
           for (var j = 0; j < rowIndices.length; j++) {
             var rowIndex = rowIndices[j];
 
-            if (allRowData[rowIndex]) {
+            if (allRowData[rowIndex] && allRowData[rowIndex][CATEGORYINDEX] === "Uncategorized") {
               allRowData[rowIndex][CATEGORYINDEX] = category;
               allRowData[rowIndex][allRowData[rowIndex].length - 1] =
                 expandedCategory;
@@ -260,10 +260,13 @@ function defineSender_(message, reply) {
   else if (mailFrom.indexOf("chase") > -1) sender = "Chase";
   else if (mailFrom.indexOf("AmericanExpress") > -1) sender = "AmericanExpress";
   else if (mailFrom.indexOf("venmo") > -1) sender = "Venmo";
+  else if (mailFrom.indexOf("bilt") > -1 || mailFrom.indexOf("biltrewards") > -1) sender = "Bilt";
   else if (mailFrom.indexOf("wellsfargo") > -1) {
     if (message.getSubject().indexOf("Confirmation Code") > -1) sender = "Zelle";
     else if (message.getSubject().indexOf("credit card purchase") > -1) sender = "Bilt";
+    else if (message.getSubject().indexOf("BillPay rent payment") > -1) sender = "Bilt";
   } else if (mailFrom.indexOf("bankofamerica") > -1) sender = "BankOfAmerica";
+  else if (mailFrom.indexOf("antriksh") > -1) sender = "Bilt"; // For testing
 
   Logger.log("DEBUG: Sender identified as: " + sender);
   return sender;
