@@ -157,7 +157,7 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
     // ---------------------------
     // TEMP PLACEHOLDERS
     // ---------------------------
-    row["category"] = row["category"] || "Uncategorized";
+    row["category"] = row["category"] || "Temporary Holds/Uncategorized";
     row["body"] = row["body"] || "AI call pending";
 
     var finalRow = [

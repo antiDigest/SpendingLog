@@ -3,3 +3,4 @@
 !*.js
 !*.html
 !parser/**/**.js
+!spreadsheet/**/**.js

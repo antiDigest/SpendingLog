@@ -1,31 +1,3 @@
-var AMOUNTINDEX = 6;
-var DATEINDEX = 4;
-var DATEYEARINDEX = 0;
-var DATEMONTHINDEX = 1;
-var DATEDAYINDEX = 2;
-var DATEDAYOFWEEKINDEX = 3;
-var TIMESTAMPINDEX = 5;
-var CARDINDEX = 10;
-var MERCHANTINDEX = 7;
-var TIMELINEINDEX = 9;
-var CATEGORYINDEX = 8;
-var ZERO = 0;
-
-var MONTH_MAP = {
-  "Jan": 0,
-  "Feb": 1,
-  "Mar": 2,
-  "Apr": 3,
-  "May": 4,
-  "Jun": 5,
-  "Jul": 6,
-  "Aug": 7,
-  "Sep": 8,
-  "Oct": 9,
-  "Nov": 10,
-  "Dec": 11
-}
-
 
 function addMonthlyCarPayment() {
   var sheet = getSpreadsheet_();
@@ -73,23 +45,6 @@ function addMonthlyCarPayment() {
   appendRows([row], sheet);
 }
 
-function getSpreadsheet_() {
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = spreadsheet.getSheetByName("Spend Email Log");
-  return sheet;
-}
-
-function getOLDSpreadsheet_() {
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = spreadsheet.getSheetByName("OLD Spend Email Log");
-  return sheet;
-}
-
-function getMonthSummarySpreadsheet_() {
-  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var sheet = spreadsheet.getSheetByName("Monthly Spend Summaries");
-  return sheet;
-}
 
 function fillSpreadsheet_(rows, sheet) {
   if (rows == null || rows.length == 0) {
@@ -107,10 +62,6 @@ function fillSpreadsheet_(rows, sheet) {
     highlightSpreadsheetRow_(sheet, row);
   }
   return filled;
-}
-
-function highlightSpreadsheetRow_(sheet, row) {
-  highlightSpreadsheetRowAtIndex_(sheet, row, sheet.getLastRow());
 }
 
 function setBackgroundForRow_(sheet, row, color) {
@@ -191,6 +142,7 @@ function fillMonthlySummarySpreadsheet_(rows, sheet) {
   var filled = true;
   for (var r = 0; r < rows.length; r++) {
     var row = rows[r];
+    applyMonthlyCategoryHeatmap_(row)
     if (sheet.appendRow(row) == null) {
       filled = false;
     }
@@ -214,47 +166,8 @@ function appendRows_(rows, sheet) {
 
   for (var i = 0; i < rows.length; i++) {
     highlightSpreadsheetRowAtIndex_(sheet, rows[i], lastRow + 1 + i);
+    highlightMonthlyPacingRows_(sheet, rows[i], lastRow + 1 + i);
   }
 
   return filled;
 }
-
-function highlightSpreadsheetRowAtIndex_(sheet, row, rowIndex) {
-  var amountStr = row[AMOUNTINDEX];
-  if (typeof amountStr === "string") {
-    amountStr = amountStr.replace(/[$,]/g, "");
-  }
-  var amount = parseFloat(amountStr);
-  var color = null;
-  if (amount > 1000) {
-    color = "#FF6F61"; // Dull-Red-ish
-  } else if (amount > 500) {
-    color = "#FFB74D"; // Red-ish
-  } else if (amount > 200) {
-    color = "#FFD54F"; // Fire Orange
-  } else if (amount > 100) {
-    color = "#FFF176"; // Orange
-  } else if (amount > 50) {
-    color = "#FFF9C4"; // Warm yellow
-  } else if (amount > 25) {
-    color = "#FFFDE7"; // light yellow
-  }
-
-  if (color) {
-    sheet.getRange(rowIndex, 1, 1, row.length).setBackground(color);
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
