@@ -12,7 +12,7 @@ function recolorAllRows() {
         var row = data[i];
         var rowIndex = i + 2; // since data starts at row 2
 
-        highlightSpreadsheetRowAtIndex_(sheet, row, rowIndex);
+        highlightSpreadsheetRowAtIndex_(sheet, row, rowIndex, INDIVIDUAL_CATEGORY_LIMITS);
         highlightMonthlyPacingRows_(sheet, row, rowIndex);
     }
 }
@@ -28,6 +28,6 @@ function recolorAllMonthlyRows() {
 
     for (let r = startRow; r <= lastRow; r++) {
         const rowRange = sheet.getRange(r, 1, 1, lastCol);
-        applyMonthlyCategoryHeatmap_(rowRange);
+        applyMonthlyCategoryHeatmap_(rowRange, MONTHLY_CATEGORY_LIMITS);
     }
 }

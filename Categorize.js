@@ -72,7 +72,7 @@ function categorizeOLD_(sheet, oldSheet) {
       Logger.log(merchant + " --> " + row[CATEGORYINDEX]);
 
       if (oldSheet.appendRow(row) != null) {
-        highlightSpreadsheetRow_(oldSheet, row);
+        highlightSpreadsheetRow_(oldSheet, row, INDIVIDUAL_CATEGORY_LIMITS);
         outputRows.push(row);
       }
     }

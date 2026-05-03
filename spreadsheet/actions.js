@@ -59,7 +59,7 @@ function fillSpreadsheet_(rows, sheet) {
     } else if (sheet.appendRow(row) == null) {
       filled = false;
     }
-    highlightSpreadsheetRow_(sheet, row);
+    highlightSpreadsheetRow_(sheet, row, INDIVIDUAL_CATEGORY_LIMITS);
   }
   return filled;
 }
@@ -126,7 +126,7 @@ function getSpreadsheetData_(sheet) {
   var lastRow = sheet.getLastRow();
   try {
     var range = sheet.getRange(2, 1, lastRow - 2, sheet.getLastColumn())
-  } catch {
+  } catch (e) {
     return []
   }
   range.sort(DATEINDEX + 1);
@@ -142,10 +142,12 @@ function fillMonthlySummarySpreadsheet_(rows, sheet) {
   var filled = true;
   for (var r = 0; r < rows.length; r++) {
     var row = rows[r];
-    applyMonthlyCategoryHeatmap_(row)
     if (sheet.appendRow(row) == null) {
       filled = false;
     }
+    const lastRow = sheet.getLastRow();
+    const rowRange = sheet.getRange(lastRow, 1, 1, row.length);
+    applyMonthlyCategoryHeatmap_(rowRange, MONTHLY_CATEGORY_LIMITS);
   }
   return filled;
 }
@@ -165,7 +167,7 @@ function appendRows_(rows, sheet) {
   ).setValues(rows);
 
   for (var i = 0; i < rows.length; i++) {
-    highlightSpreadsheetRowAtIndex_(sheet, rows[i], lastRow + 1 + i);
+    highlightSpreadsheetRowAtIndex_(sheet, rows[i], lastRow + 1 + i, INDIVIDUAL_CATEGORY_LIMITS);
     highlightMonthlyPacingRows_(sheet, rows[i], lastRow + 1 + i);
   }
 

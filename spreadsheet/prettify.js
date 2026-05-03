@@ -1,11 +1,11 @@
 
 
 
-function highlightSpreadsheetRow_(sheet, row) {
-    highlightSpreadsheetRowAtIndex_(sheet, row, sheet.getLastRow());
+function highlightSpreadsheetRow_(sheet, row, limits) {
+    highlightSpreadsheetRowAtIndex_(sheet, row, sheet.getLastRow(), limits);
 }
 
-function highlightSpreadsheetRowAtIndex_(sheet, row, rowIndex) {
+function highlightSpreadsheetRowAtIndex_(sheet, row, rowIndex, limits) {
     const headers = sheet.getRange(1, 1, 1, row.length).getValues()[0];
     const range = sheet.getRange(rowIndex, 1, 1, row.length);
     const values = row;
@@ -19,8 +19,8 @@ function highlightSpreadsheetRowAtIndex_(sheet, row, rowIndex) {
         let color = null;
 
         // skip non-category columns (including Amount, Total, Card fields, etc.)
-        if (INDIVIDUAL_CATEGORY_LIMITS[category] && !isNaN(value)) {
-            const ratio = value / INDIVIDUAL_CATEGORY_LIMITS[category];
+        if (limits && limits[category] && !isNaN(value)) {
+            const ratio = value / limits[category];
             color = getSpendColor_(ratio);
         }
 
@@ -88,7 +88,7 @@ function applyPacingColors_(sheet, data, dates, startRow, targetRowIndex, rowToA
         .setBackground(color);
 }
 
-function getScheduledFixedSpend_(date) {
+function getFixedSpendByDate_(date) {
     const day = date.getDate();
     let fixed = 0;
 
@@ -136,26 +136,28 @@ function parseAmount_(value) {
     return parseFloat(value);
 }
 
-function applyMonthlyCategoryHeatmap_(rowRange) {
+function applyMonthlyCategoryHeatmap_(rowRange, limits) {
     const sheet = rowRange.getSheet();
     const values = rowRange.getValues()[0];
     const headers = sheet.getRange(1, 1, 1, rowRange.getWidth()).getValues()[0];
 
     const totalIndex = headers.indexOf("Total");
 
-    applyCategoryColors_(rowRange, values, headers);
+    applyCategoryColors_(rowRange, values, headers, limits);
     applyTotalColor_(rowRange, values, totalIndex);
 }
 
-function applyCategoryColors_(rowRange, values, headers) {
+function applyCategoryColors_(rowRange, values, headers, limits) {
+    if (!limits) return;
+
     for (let i = 0; i < values.length; i++) {
         const category = normalizeHeader_(headers[i]);
         const amount = values[i];
 
-        if (!CATEGORY_LIMITS.hasOwnProperty(category)) continue;
+        if (!limits.hasOwnProperty(category)) continue;
         if (amount == null || isNaN(amount)) continue;
 
-        const ratio = amount / CATEGORY_LIMITS[category];
+        const ratio = amount / limits[category];
         const color = getSpendColor_(ratio);
 
         if (color) {
