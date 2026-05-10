@@ -201,6 +201,8 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
     var uniqueMerchants = [...new Set(allMerchantsToCategorize)];
     var categorizedResults = categorizeBatch_(uniqueMerchants);
 
+    Logger.log("DEBUG: categorized results: " + categorizedResults)
+
     for (var merchant in categorizedResults) {
       if (categorizedResults.hasOwnProperty(merchant)) {
         var categoryData = categorizedResults[merchant];
