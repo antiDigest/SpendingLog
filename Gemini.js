@@ -22,6 +22,8 @@ function sendPromptToGeminiAI_(q) {
   try {
     const response = UrlFetchApp.fetch(url, options);
     jsonResponse = JSON.parse(response.getContentText());
+    Logger.log("DEBUG: gemini response: " + response.getContentText());
+    Logger.log("DEBUG: gemini response converted to json: " + jsonResponse);
   } catch (e) {
     Logger.log("Error returned from Gemini: " + e);
     return "{}";
