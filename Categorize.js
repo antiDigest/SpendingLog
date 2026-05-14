@@ -5,22 +5,22 @@ function categorizeBatch_(merchants) {
       All responses should match the order of the input values.
 
       Categories:
-      1. Grocery
-      2. Restaurants/Food & Drink
-      3. Online Retail/Marketplace
-      4. Retail/Shopping
-      5. Gas/Automotive
-      6. Rent/Utilities/Phone/Internet
-      7. Entertainment/Events
-      8. Insurance/Financial
-      9. Transportation/Travel
-      10. Bakery/Coffee Shops
-      11. Home Improvement/Hardware
-      12. Medical/Pharmacy
-      13. Donations/Charities
-      14. Sports/Recreation
-      15. Career/Growth
-      16. Other
+      1. ${GROCERY}
+      2. ${RESTAURANTS_FOOD_DRINK}
+      3. ${ONLINE_RETAIL_MARKETPLACE}
+      4. ${RETAIL_SHOPPING}
+      5. ${GAS_AUTOMOTIVE}
+      6. ${RENT_UTILITIES_PHONE_INTERNET}
+      7. ${ENTERTAINMENT_EVENTS}
+      8. ${INSURANCE_FINANCIAL}
+      9. ${TRANSPORTATION_TRAVEL}
+      10. ${BAKERY_COFFEE_SHOPS}
+      11. ${HOME_IMPROVEMENT_HARDWARE}
+      12. ${MEDICAL_PHARMACY}
+      13. ${DONATIONS_CHARITY}
+      14. ${SPORTS_RECREATION}
+      15. ${CAREER_GROWTH}
+      16. ${OTHER}
 
       Merchants:
       ${JSON.stringify(merchants, null, 2)}
@@ -28,15 +28,15 @@ function categorizeBatch_(merchants) {
       Example format:
       {
         "Starbucks": {
-          "Category": "Bakery/Coffee Shops",
+          "Category": "${BAKERY_COFFEE_SHOPS}",
           "ExpandedCategory": "Bakery and coffee shops, eatables"
         },
         "Amazon": {
-          "Category": "Online Retails/Marketplace",
+          "Category": "${ONLINE_RETAIL_MARKETPLACE}",
           "ExpandedCategory": "amazon online marketplace"
         },
         "INTERVIEWDB": {
-          "Category": "Career/Growth",
+          "Category": "${CAREER_GROWTH}",
           "ExpandedCategory": "interview prep"
         },
       }`;
@@ -67,7 +67,7 @@ function categorizeOLD_(sheet, oldSheet) {
     for (var j = 0; j < batch.length; j++) {
       var row = batch[j];
       var merchant = row[MERCHANTINDEX];
-      row[CATEGORYINDEX] = categorizedResults[merchant] || "Other";
+      row[CATEGORYINDEX] = categorizedResults[merchant] || OTHER;
 
       Logger.log(merchant + " --> " + row[CATEGORYINDEX]);
 

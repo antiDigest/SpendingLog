@@ -145,7 +145,7 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
     // ---------------------------
     // MERCHANT COLLECTION (only if valid-ish)
     // ---------------------------
-    if (merchant && merchant !== "Unknown" && merchant !== AI_CALL_PENDING_MESSAGE && merchant !== "Other") {
+    if (merchant && merchant !== "Unknown" && merchant !== AI_CALL_PENDING_MESSAGE && merchant !== OTHER) {
       allMerchantsToCategorize.push(merchant);
 
       if (!merchantRowMapping[merchant]) {
@@ -207,7 +207,7 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
       if (categorizedResults.hasOwnProperty(merchant)) {
         var categoryData = categorizedResults[merchant];
 
-        var category = categoryData.Category || "Other";
+        var category = categoryData.Category || OTHER;
         var expandedCategory =
           categoryData.ExpandedCategory ||
           "Categorized by Gemini AI (Batch).";

@@ -1,6 +1,6 @@
 var summaryTypes = ["Discover", "Chase", "Citi", "AmericanExpress", "Venmo", "Zelle", "BankOfAmerica", "Bilt", "Total"];
 
-var categorySummaryTypes = ["Bakery/Coffee Shops","Donation/Charity","Entertainment/Events","Gas/Automotive","Grocery","Home Improvement/Hardware","Insurance/Financial","Medical/Pharmacy","Online Retail/Marketplace","Other","Restaurants/Food & Drink","Retail/Shopping","Sports/Recreation",TEMPORARY_UNCATEGORIZED,"Transportation/Travel","Rent/Utilities/Phone/Internet"]
+var categorySummaryTypes = [BAKERY_COFFEE_SHOPS, DONATIONS_CHARITY, ENTERTAINMENT_EVENTS, GAS_AUTOMOTIVE, GROCERY, HOME_IMPROVEMENT_HARDWARE, INSURANCE_FINANCIAL, MEDICAL_PHARMACY, ONLINE_RETAIL_MARKETPLACE, OTHER, RESTAURANTS_FOOD_DRINK, RETAIL_SHOPPING, SPORTS_RECREATION, TEMPORARY_UNCATEGORIZED, TRANSPORTATION_TRAVEL, RENT_UTILITIES_PHONE_INTERNET]
 
 SUMMARY_TYPE_TOTAL_INDEX = 8;
 
@@ -24,10 +24,10 @@ function summary_(data, monthSummarySheet) {
   Logger.log(row[DATEYEARINDEX] + " :: " + row[DATEMONTHINDEX])
   Logger.log(summary)
   summaryRows.push([row[DATEYEARINDEX], row[DATEMONTHINDEX], summary["Discover"], summary["Chase"], summary["Citi"], summary["AmericanExpress"],
-                      summary["Venmo"], summary["Zelle"], summary["BankOfAmerica"], summary["Bilt"], summary["Bakery/Coffee Shops"], summary["Donation/Charity"], summary["Entertainment/Events"], 
-                      summary["Gas/Automotive"], summary["Grocery"], summary["Home Improvement/Hardware"], summary["Insurance/Financial"], summary["Medical/Pharmacy"], 
-                      summary["Online Retail/Marketplace"], summary["Other"], summary["Restaurants/Food & Drink"], summary["Retail/Shopping"], summary["Sports/Recreation"], 
-                      summary[TEMPORARY_UNCATEGORIZED], summary["Transportation/Travel"], summary["Rent/Utilities/Phone/Internet"], summary["Total"]])
+                      summary["Venmo"], summary["Zelle"], summary["BankOfAmerica"], summary["Bilt"], summary[BAKERY_COFFEE_SHOPS], summary[DONATIONS_CHARITY], summary[ENTERTAINMENT_EVENTS], 
+                      summary[GAS_AUTOMOTIVE], summary[GROCERY], summary[HOME_IMPROVEMENT_HARDWARE], summary[INSURANCE_FINANCIAL], summary[MEDICAL_PHARMACY], 
+                      summary[ONLINE_RETAIL_MARKETPLACE], summary[OTHER], summary[RESTAURANTS_FOOD_DRINK], summary[RETAIL_SHOPPING], summary[SPORTS_RECREATION], 
+                      summary[TEMPORARY_UNCATEGORIZED], summary[TRANSPORTATION_TRAVEL], summary[RENT_UTILITIES_PHONE_INTERNET], summary["Total"]])
 
   if(!fillMonthlySummarySpreadsheet_(summaryRows, monthSummarySheet)) {
     throw "Error"
@@ -71,10 +71,10 @@ function summarizeAllPastMonths_(sheet, monthSummarySheet) {
     Logger.log(summary)
 
     summaryRows.push([row[DATEYEARINDEX], row[DATEMONTHINDEX], summary["Discover"], summary["Chase"], summary["Citi"], summary["AmericanExpress"],
-                      summary["Venmo"], summary["Zelle"], summary["BankOfAmerica"], summary["Bilt"], summary["Bakery/Coffee Shops"], summary["Donation/Charity"], summary["Entertainment/Events"], 
-                      summary["Gas/Automotive"], summary["Grocery"], summary["Home Improvement/Hardware"], summary["Insurance/Financial"], summary["Medical/Pharmacy"], 
-                      summary["Online Retail/Marketplace"], summary["Other"], summary["Restaurants/Food & Drink"], summary["Retail/Shopping"], summary["Sports/Recreation"], 
-                      summary[TEMPORARY_UNCATEGORIZED], summary["Transportation/Travel"], summary["Rent/Utilities/Phone/Internet"], summary["Total"]])
+                      summary["Venmo"], summary["Zelle"], summary["BankOfAmerica"], summary["Bilt"], summary[BAKERY_COFFEE_SHOPS], summary[DONATIONS_CHARITY], summary[ENTERTAINMENT_EVENTS], 
+                      summary[GAS_AUTOMOTIVE], summary[GROCERY], summary[HOME_IMPROVEMENT_HARDWARE], summary[INSURANCE_FINANCIAL], summary[MEDICAL_PHARMACY], 
+                      summary[ONLINE_RETAIL_MARKETPLACE], summary[OTHER], summary[RESTAURANTS_FOOD_DRINK], summary[RETAIL_SHOPPING], summary[SPORTS_RECREATION], 
+                      summary[TEMPORARY_UNCATEGORIZED], summary[TRANSPORTATION_TRAVEL], summary[RENT_UTILITIES_PHONE_INTERNET], summary["Total"]])
 
     // break;
   }

@@ -11,7 +11,7 @@ var CAREER_GROWTH = "Career/Growth";
 var BAKERY_COFFEE_SHOPS = "Bakery/Coffee Shops";
 var HOME_IMPROVEMENT_HARDWARE = "Home Improvement/Hardware";
 var MEDICAL_PHARMACY = "Medical/Pharmacy";
-var DONATIONS_CHARITY = "Donations/Charity";
+var DONATIONS_CHARITY = "Donation/Charity";
 var SPORTS_RECREATION = "Sports/Recreation";
 var OTHER = "Other";
 
