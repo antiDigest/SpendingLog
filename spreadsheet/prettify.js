@@ -93,16 +93,21 @@ function getFixedSpendByDate_(date) {
     let fixed = 0;
 
     // 🏠 Rent / utilities (assumed early month baseline)
-    fixed += INDIVIDUAL_CATEGORY_LIMITS["Rent/Utilities/Phone/Internet"];
+    fixed += INDIVIDUAL_CATEGORY_LIMITS[RENT_UTILITIES_PHONE_INTERNET];
+
+    if (day >= 7) {
+        fixed += 183; // for Auto insurance
+        fixed += MONTHLY_CATEGORY_LIMITS[SPORTS_RECREATION]; // for Suniksha and Antriksh gym membership
+    }
 
     // 🚗 Monthly travel charge on 19th
     if (day >= 19) {
-        fixed += 200;
+        fixed += 200; // for SPOTHERO
     }
 
     // 🛡️ Insurance on 20th
     if (day >= 20) {
-        fixed += INDIVIDUAL_CATEGORY_LIMITS["Insurance/Financial"];
+        fixed += INDIVIDUAL_CATEGORY_LIMITS[INSURANCE_FINANCIAL];
     }
 
     return fixed;
@@ -116,9 +121,11 @@ function getExpectedSpendForDate_(monthlyCap, date) {
 
     const variableBudget =
         monthlyCap -
-        INDIVIDUAL_CATEGORY_LIMITS["Rent/Utilities/Phone/Internet"] -
-        INDIVIDUAL_CATEGORY_LIMITS["Insurance/Financial"] -
-        200; // SPOTHERO every month
+        INDIVIDUAL_CATEGORY_LIMITS[RENT_UTILITIES_PHONE_INTERNET] -
+        INDIVIDUAL_CATEGORY_LIMITS[INSURANCE_FINANCIAL] -
+        200 - // SPOTHERO every month
+        183 - // Statefarm insurance every month
+        MONTHLY_CATEGORY_LIMITS[SPORTS_RECREATION]; // Suniksha and Antriksh gym membership
 
     const variableProgress = variableBudget * (day / daysInMonth);
 
@@ -209,7 +216,7 @@ function normalizeHeader_(h) {
 
 function getPacingColor_(ratio) {
     // 🟢 On track / behind pace
-    if (ratio <= 0.8) {
+    if (ratio <= 0.90) {
         return "#F8FFFA"; // barely visible green (consistent with your system)
     }
 

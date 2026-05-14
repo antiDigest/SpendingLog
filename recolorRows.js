@@ -1,5 +1,5 @@
 function recolorAllRows() {
-    var sheet = getOLDSpreadsheet_();
+    var sheet = getSpreadsheet_();
     var lastRow = sheet.getLastRow();
     var lastCol = sheet.getLastColumn();
 
