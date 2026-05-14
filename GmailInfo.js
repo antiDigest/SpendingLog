@@ -145,7 +145,7 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
     // ---------------------------
     // MERCHANT COLLECTION (only if valid-ish)
     // ---------------------------
-    if (merchant && merchant !== "Unknown" && merchant !== "AI call pending" && merchant !== "Other") {
+    if (merchant && merchant !== "Unknown" && merchant !== AI_CALL_PENDING_MESSAGE && merchant !== "Other") {
       allMerchantsToCategorize.push(merchant);
 
       if (!merchantRowMapping[merchant]) {
@@ -157,8 +157,8 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
     // ---------------------------
     // TEMP PLACEHOLDERS
     // ---------------------------
-    row["category"] = row["category"] || "Temporary Holds/Uncategorized";
-    row["body"] = row["body"] || "AI call pending";
+    row["category"] = row["category"] || TEMPORARY_UNCATEGORIZED;
+    row["body"] = row["body"] || AI_CALL_PENDING_MESSAGE;
 
     var finalRow = [
       row["year"],
@@ -201,7 +201,7 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
     var uniqueMerchants = [...new Set(allMerchantsToCategorize)];
     var categorizedResults = categorizeBatch_(uniqueMerchants);
 
-    Logger.log("DEBUG: gemini categorized results: " + categorizedResults)
+    Logger.log("DEBUG: gemini categorized results: " + JSON.stringify(categorizedResults))
 
     for (var merchant in categorizedResults) {
       if (categorizedResults.hasOwnProperty(merchant)) {
@@ -218,7 +218,7 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
           for (var j = 0; j < rowIndices.length; j++) {
             var rowIndex = rowIndices[j];
 
-            if (allRowData[rowIndex] && allRowData[rowIndex][CATEGORYINDEX] === "Uncategorized") {
+            if (allRowData[rowIndex] && allRowData[rowIndex][CATEGORYINDEX] === TEMPORARY_UNCATEGORIZED) {
               allRowData[rowIndex][CATEGORYINDEX] = category;
               allRowData[rowIndex][allRowData[rowIndex].length - 1] =
                 expandedCategory;

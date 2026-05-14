@@ -27,55 +27,54 @@ var MONTH_MAP = {
 }
 
 const INDIVIDUAL_CATEGORY_LIMITS = {
-    "Rent/Utilities/Phone/Internet": 2300,  // fixed household bill
-    "Insurance/Financial": 1150,            // fixed household bill
+    RENT_UTILITIES_PHONE_INTERNET: 2300,  // fixed household bill
+    INSURANCE_FINANCIAL: 1150,            // fixed household bill
 
-    "Medical/Pharmacy": 25,                // routine is low; big bills are one-offs
-    "Groceries": 175,                      // solo median $203, married/2 = $150
-    "Restaurants/Food & Drink": 130,       // both eras ~$150 median per person
-    "Bakery/Coffee Shops": 30,             // avg $33-34 solo and married
+    MEDICAL_PHARMACY: 25,                // routine is low; big bills are one-offs
+    GROCERY: 175,                      // solo median $203, married/2 = $150
+    RESTAURANTS_FOOD_DRINK: 130,       // both eras ~$150 median per person
+    BAKERY_COFFEE_SHOPS: 30,             // avg $33-34 solo and married
 
-    "Entertainment/Events": 50,            // solo was lumpy; married very low
-    "Sports/Recreation": 90,              // solo median $105, married/2 = $60
-    "Donation/Charity": 15,               // infrequent and small
+    ENTERTAINMENT_EVENTS: 50,            // solo was lumpy; married very low
+    SPORTS_RECREATION: 90,              // solo median $105, married/2 = $60
+    DONATIONS_CHARITY: 15,               // infrequent and small
 
-    "Online Retail/Marketplace": 165,      // solo median $195, married/2 = $104
-    "Retail/Shopping": 115,               // married/2 median = $133; tightened
-    "Home Improvement/Hardware": 65,       // shared project; $65 each is fair
-    "Other": 75,                          // tightened hard; one-offs excluded manually
+    ONLINE_RETAIL_MARKETPLACE: 165,      // solo median $195, married/2 = $104
+    RETAIL_SHOPPING: 115,               // married/2 median = $133; tightened
+    HOME_IMPROVEMENT_HARDWARE: 65,       // shared project; $65 each is fair
+    OTHER: 75,                          // tightened hard; one-offs excluded manually
 
-    "Gas/Automotive": 75,                 // one car, solo median was $89
-    "Transportation/Travel": 55,          // SpotHero is fixed; this covers personal travel
-    "Career/Growth": 200,                 // personal development, full limit per person
+    GAS_AUTOMOTIVE: 75,                 // one car, solo median was $89
+    TRANSPORTATION_TRAVEL: 55,          // SpotHero is fixed; this covers personal travel
+    CAREER_GROWTH: 200,                 // personal development, full limit per person
 
-    "Temporary Holds/Uncategorized": 25,  // catch-all
+    TEMPORARY_UNCATEGORIZED: 25,  // catch-all
 };
 
 const MONTHLY_CATEGORY_LIMITS = {
-    "Rent/Utilities/Phone/Internet": 2300,  // avg $1,989 married, median $2,200 — small buffer added
-    "Insurance/Financial": 1200,             // typical $25/mo State Farm + ~$500 Progressive semi-annually
-    "Medical/Pharmacy": 200,               // routine is $60-100; big one-offs should be excluded manually
+    RENT_UTILITIES_PHONE_INTERNET: 2300,  // avg $1,989 married, median $2,200 — small buffer added
+    INSURANCE_FINANCIAL: 1200,             // typical $25/mo State Farm + ~$500 Progressive semi-annually
+    MEDICAL_PHARMACY: 200,               // routine is $60-100; big one-offs should be excluded manually
 
-    "Grocery": 500,                      // married median $301, mean $339 — room for guests
-    "Restaurants/Food & Drink": 200,       // married median just $153 — old $500 was way too loose
-    "Bakery/Coffee Shops": 50,             // actual avg $41, max $127
+    GROCERY: 500,                      // married median $301, mean $339 — room for guests
+    RESTAURANTS_FOOD_DRINK: 200,       // married median just $153 — old $500 was way too loose
+    BAKERY_COFFEE_SHOPS: 50,             // actual avg $41, max $127
 
-    "Entertainment/Events": 100,           // married median only $15 — you're barely spending here
-    "Sports/Recreation": 175,             // median $119-132, mean $133 — fits well
-    "Donation/Charity": 100,              // very infrequent, ~$31 avg when it occurs
+    ENTERTAINMENT_EVENTS: 100,           // married median only $15 — you're barely spending here
+    SPORTS_RECREATION: 175,             // median $119-132, mean $133 — fits well
+    DONATIONS_CHARITY: 100,              // very infrequent, ~$31 avg when it occurs
 
-    "Online Retail/Marketplace": 275,     // mean $310, occasional spike months
-    "Retail/Shopping": 275,              // mean $405 but driven by big purchase months; $350 is honest
-    "Home Improvement/Hardware": 175,    // routine ~$100-150/mo (Crosscut Hardwoods), buffer for hardware runs
-    "Other": 100,                        // consistent with actual; exclude one-offs (USCIS, etc.) manually
+    ONLINE_RETAIL_MARKETPLACE: 275,     // mean $310, occasional spike months
+    RETAIL_SHOPPING: 275,              // mean $405 but driven by big purchase months; $350 is honest
+    HOME_IMPROVEMENT_HARDWARE: 175,    // routine ~$100-150/mo (Crosscut Hardwoods), buffer for hardware runs
+    OTHER: 100,                        // consistent with actual; exclude one-offs (USCIS, etc.) manually
 
-    "Gas/Automotive": 100,               // actual gas avg only ~$55-65/mo; exclude car repairs separately
-    "Transportation/Travel": 250,        // median $202, but trip spikes happen; $400 is realistic
+    GAS_AUTOMOTIVE: 100,               // actual gas avg only ~$55-65/mo; exclude car repairs separately
+    TRANSPORTATION_TRAVEL: 250,        // median $202, but trip spikes happen; $400 is realistic
 
-    "Career/Growth": 200,               // LinkedIn + LeetCode + interview prep recur (~$80-150/mo)
-    "Donation/Charity": 100,
+    CAREER_GROWTH: 200,               // LinkedIn + LeetCode + interview prep recur (~$80-150/mo)
 
-    "Temporary Holds/Uncategorized": 50  // almost never triggered; $75 is plenty
+    TEMPORARY_UNCATEGORIZED: 50  // almost never triggered; $75 is plenty
 };
 
 const SPENDING_BUDGET_PER_MONTH = 4800;

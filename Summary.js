@@ -1,6 +1,6 @@
 var summaryTypes = ["Discover", "Chase", "Citi", "AmericanExpress", "Venmo", "Zelle", "BankOfAmerica", "Bilt", "Total"];
 
-var categorySummaryTypes = ["Bakery/Coffee Shops","Donation/Charity","Entertainment/Events","Gas/Automotive","Grocery","Home Improvement/Hardware","Insurance/Financial","Medical/Pharmacy","Online Retail/Marketplace","Other","Restaurants/Food & Drink","Retail/Shopping","Sports/Recreation","Temporary Holds/Uncategorized","Transportation/Travel","Rent/Utilities/Phone/Internet"]
+var categorySummaryTypes = ["Bakery/Coffee Shops","Donation/Charity","Entertainment/Events","Gas/Automotive","Grocery","Home Improvement/Hardware","Insurance/Financial","Medical/Pharmacy","Online Retail/Marketplace","Other","Restaurants/Food & Drink","Retail/Shopping","Sports/Recreation",TEMPORARY_UNCATEGORIZED,"Transportation/Travel","Rent/Utilities/Phone/Internet"]
 
 SUMMARY_TYPE_TOTAL_INDEX = 8;
 
@@ -27,7 +27,7 @@ function summary_(data, monthSummarySheet) {
                       summary["Venmo"], summary["Zelle"], summary["BankOfAmerica"], summary["Bilt"], summary["Bakery/Coffee Shops"], summary["Donation/Charity"], summary["Entertainment/Events"], 
                       summary["Gas/Automotive"], summary["Grocery"], summary["Home Improvement/Hardware"], summary["Insurance/Financial"], summary["Medical/Pharmacy"], 
                       summary["Online Retail/Marketplace"], summary["Other"], summary["Restaurants/Food & Drink"], summary["Retail/Shopping"], summary["Sports/Recreation"], 
-                      summary["Temporary Holds/Uncategorized"], summary["Transportation/Travel"], summary["Rent/Utilities/Phone/Internet"], summary["Total"]])
+                      summary[TEMPORARY_UNCATEGORIZED], summary["Transportation/Travel"], summary["Rent/Utilities/Phone/Internet"], summary["Total"]])
 
   if(!fillMonthlySummarySpreadsheet_(summaryRows, monthSummarySheet)) {
     throw "Error"
@@ -74,7 +74,7 @@ function summarizeAllPastMonths_(sheet, monthSummarySheet) {
                       summary["Venmo"], summary["Zelle"], summary["BankOfAmerica"], summary["Bilt"], summary["Bakery/Coffee Shops"], summary["Donation/Charity"], summary["Entertainment/Events"], 
                       summary["Gas/Automotive"], summary["Grocery"], summary["Home Improvement/Hardware"], summary["Insurance/Financial"], summary["Medical/Pharmacy"], 
                       summary["Online Retail/Marketplace"], summary["Other"], summary["Restaurants/Food & Drink"], summary["Retail/Shopping"], summary["Sports/Recreation"], 
-                      summary["Temporary Holds/Uncategorized"], summary["Transportation/Travel"], summary["Rent/Utilities/Phone/Internet"], summary["Total"]])
+                      summary[TEMPORARY_UNCATEGORIZED], summary["Transportation/Travel"], summary["Rent/Utilities/Phone/Internet"], summary["Total"]])
 
     // break;
   }
