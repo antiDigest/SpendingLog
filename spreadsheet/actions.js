@@ -4,7 +4,7 @@ function addMonthlyCarPayment() {
   var today = new Date();
 
   // Only proceed if today is the 20th
-  if (today.getDate() !== 20) return;
+  if (today.getDate() < 20) return;
 
   var month = today.getMonth();
   var year = today.getFullYear();
@@ -42,7 +42,8 @@ function addMonthlyCarPayment() {
     "",
     "Scheduled Honda-CRV payment"
   ];
-  appendRows([row], sheet);
+
+  appendRows_([row], sheet);
 }
 
 
