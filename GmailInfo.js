@@ -257,7 +257,7 @@ function defineSender_(message, reply) {
   var mailFrom = message.getFrom();
   var sender = "Unknown";
   if (reply || mailFrom.indexOf("4698793964") > -1) sender = "Reply";
-  else if (mailFrom.indexOf("discover") > -1) sender = "Discover";
+  else if (mailFrom.indexOf("discover") > -1 || mailFrom.indexOf("capitalone@notification.capitalone.com") > -1 || mailFrom.indexOf("sunikshagupta@gmail.com") > -1) sender = "Discover";
   else if (mailFrom.indexOf("citi") > -1) sender = "Citi";
   else if (mailFrom.indexOf("chase") > -1) sender = "Chase";
   else if (mailFrom.indexOf("AmericanExpress") > -1) sender = "AmericanExpress";

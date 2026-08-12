@@ -19,7 +19,7 @@ var AI_CALL_PENDING_MESSAGE = "AI call pending";
 var TEMPORARY_UNCATEGORIZED = "Temporary Holds/Uncategorized";
 
 var BANK_CONFIG = {
-  "Discover": { "stoppingPhrase": "1-800-DISCOVER", "tags": true },
+  "Discover": { "stoppingPhrase": "Please visit your account to", "tags": true },
   "Citi": { "stoppingPhrase": "Your Citi Team", "tags": true },
   "Chase": { "stoppingPhrase": "Do not reply to this Alert.", "tags": false },
   "AmericanExpress": { "stoppingPhrase": "*The amount above may not", "tags": false },

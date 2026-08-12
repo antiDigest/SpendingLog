@@ -19,14 +19,22 @@ var GenericParser = {
   },
 
   Discover: function (sentences, row) {
+    var body = sentences.join(" :: ");
     for (var i = 0; i < sentences.length; i++) {
       if (sentences[i].indexOf("Merchant") > -1) {
         row["merchant"] = sentences[i].split("Merchant: ")[1] || "";
       } else if (sentences[i].indexOf("Last 4 #:") > -1) {
         row["last4"] = sentences[i].split("Last 4 #:")[1].split(" ")[0].split(";")[1];
+      } else if (sentences[i].indexOf("ending in ") > -1) {
+        row["last4"] = sentences[i].split("ending in ")[1].trim().split(/\s/)[0];
       }
     }
-    row["amount"] = this.extractAmount(sentences.join(" :: "));
+    if (!row["merchant"]) {
+      var atMatch = body.match(/ at ([^,]+), a pending/i) || body.match(/ at ([^,]+),/);
+      if (atMatch) row["merchant"] = atMatch[1].trim();
+    }
+    if (!row["last4"]) row["last4"] = this.extractLast4(body) || "";
+    row["amount"] = this.extractAmount(body);
   },
 
   Chase: function (sentences, row) {
