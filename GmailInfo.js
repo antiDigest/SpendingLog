@@ -53,8 +53,23 @@ function getGmailData_(threads, sheet, deleteForever, reply) {
   var finalProcessedRows = result.rows;
 
   // Write + send
-  fillSpreadsheet_(finalProcessedRows, sheet);
-  sendText(finalProcessedRows, columns);
+  var rowResults = fillSpreadsheet_(finalProcessedRows, sheet);
+
+  // Update thread statuses based on insertion results
+  var successfulRows = [];
+  for (var i = 0; i < rowResults.length; i++) {
+    var threadId = result.rowThreadIds[i];
+    if (rowResults[i]) {
+      successfulRows.push(finalProcessedRows[i]);
+    } else {
+      if (threadStatusMap[threadId]) {
+        threadStatusMap[threadId].status = "FAILED_TO_LOG";
+        threadStatusMap[threadId].reasons.push("Row insertion failed in spreadsheet.");
+      }
+    }
+  }
+
+  sendText(successfulRows, columns);
 
   // SAFE DELETE LOGIC
   if (deleteForever) {
@@ -85,6 +100,7 @@ function getGmailData_(threads, sheet, deleteForever, reply) {
 // New function to process all messages in batch
 function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
   var allRowData = [];
+  var rowThreadIds = [];
   var allMerchantsToCategorize = [];
   var merchantRowMapping = {};
 
@@ -179,6 +195,7 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
     ];
 
     allRowData.push(finalRow);
+    rowThreadIds.push(threadId);
 
     // ---------------------------
     // THREAD STATUS UPDATE
@@ -233,6 +250,7 @@ function processAllMessages_(allMessages, sheet, reply, threadStatusMap) {
 
   return {
     rows: allRowData,
+    rowThreadIds: rowThreadIds,
     threadStatusMap: threadStatusMap
   };
 }

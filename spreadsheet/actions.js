@@ -48,21 +48,36 @@ function addMonthlyCarPayment() {
 
 
 function fillSpreadsheet_(rows, sheet) {
+  var results = [];
   if (rows == null || rows.length == 0) {
-    return false;
+    return results;
   }
 
-  var filled = true;
   for (var r = 0; r < rows.length; r++) {
     var row = rows[r];
+    var success = true;
+
+    // Check for mandatory fields
     if ((row[AMOUNTINDEX] == "" || row[AMOUNTINDEX] == null) || (row[DATEINDEX] == "" || row[DATEINDEX] == null)) {
-      return false;
-    } else if (sheet.appendRow(row) == null) {
-      filled = false;
+      Logger.log("Row " + r + " failed validation: missing amount or date.");
+      success = false;
+    } else {
+      try {
+        if (sheet.appendRow(row) == null) {
+          success = false;
+        }
+      } catch (e) {
+        Logger.log("Error appending row " + r + " to spreadsheet: " + e.toString());
+        success = false;
+      }
     }
-    highlightSpreadsheetRow_(sheet, row, INDIVIDUAL_CATEGORY_LIMITS);
+
+    if (success) {
+      highlightSpreadsheetRow_(sheet, row, INDIVIDUAL_CATEGORY_LIMITS);
+    }
+    results.push(success);
   }
-  return filled;
+  return results;
 }
 
 function setBackgroundForRow_(sheet, row, color) {
